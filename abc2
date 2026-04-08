@@ -1,0 +1,284 @@
+lab15
+docker --version
+List running containers
+docker ps
+List all containers
+docker ps -a
+List images
+docker images
+docker run hello-world
+docker pull nginx
+Run container:
+docker run -d -p 8080:80 nginx
+Open browser:
+http://localhost:8080
+docker ps
+Stop container:
+docker stop <container_id>
+Remove container:
+docker rm <container_id>
+ lab 16
+mkdir docker-app
+cd docker-app
+Create a file named:
+1)	sample.py
+Add the following code:
+print("Hello from Docker container!")
+
+2)app.py (webserver code)
+Add the following code:
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+
+PORT = 5020
+
+class MyHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(b"<h1>Hello from Docker Python Container</h1>")
+
+server = HTTPServer(("0.0.0.0", PORT), MyHandler)
+print(f"Server running on port {PORT}...")
+server.serve_forever()
+
+Task 2 — Write the Dockerfile
+Create a file named:
+1)	Dockerfile for sample.py
+Add:
+FROM python:3.9-slim
+WORKDIR /app
+COPY app.py .
+CMD ["python", "app.py"]
+
+1)	Dockerfile for app.py
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY app.py .
+
+EXPOSE 5020
+
+CMD ["python", "app.py"]
+Task 3 — Build the Docker Image
+Run in the project folder:
+docker build -t my-python-app .
+Explanation:
+•	-t → tag (name of image)
+•	. → current directory (contains Dockerfile)
+Task 4 — Check Created Image
+docker images
+You should see:
+my-python-app
+Task 5 — Run the Container
+docker run my-python-app
+Expected output of sample.py:
+Hello from Docker container!
+
+docker run -p 5000:5000 my-python-app1
+Expected output of app.py:
+Hello from Docker Python Container in web browser
+
+ lab 17
+mkdir docker-app
+cd docker-app
+Create a file named:
+1)	sample.py
+Add the following code:
+print("Hello from Docker container!")
+
+2)app.py (webserver code)
+Add the following code:
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+
+PORT = 5020
+
+class MyHandler(SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(b"<h1>Hello from Docker Python Container</h1>")
+
+server = HTTPServer(("0.0.0.0", PORT), MyHandler)
+print(f"Server running on port {PORT}...")
+server.serve_forever()
+
+Task 2 — Write the Dockerfile
+Create a file named:
+1)	Dockerfile for sample.py
+Add:
+FROM python:3.9-slim
+WORKDIR /app
+COPY app.py .
+CMD ["python", "app.py"]
+
+1)	Dockerfile for app.py
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY app.py .
+
+EXPOSE 5020
+
+CMD ["python", "app.py"]
+Task 3 — Build the Docker Image
+Run in the project folder:
+docker build -t my-python-app .
+Explanation:
+•	-t → tag (name of image)
+•	. → current directory (contains Dockerfile)
+Task 4 — Check Created Image
+docker images
+You should see:
+my-python-app
+Task 5 — Run the Container
+docker run my-python-app
+Expected output of sample.py:
+Hello from Docker container!
+
+docker run -p 5000:5000 my-python-app1
+Expected output of app.py:
+Hello from Docker Python Container in web browser
+Open browser:
+http://localhost:8080
+docker volume create myvolume
+Verify:
+docker volume ls
+Step 2: Run container using volume
+docker run -it -v myvolume:/data ubuntu bash
+Step 3: Create file inside container
+Inside container:
+cd /data
+echo "Docker Volume Persistence Test" > test.txt
+exit
+docker run -it -v myvolume:/data ubuntu bash
+Check file:
+cat /data/test.txt
+Add HTML file:
+docker run -it -v myvolume:/data ubuntu bash
+echo "<h1>Persistent Web Page</h1>" > /data/index.html
+exit
+Open browser:
+http://localhost:8081
+
+lab 18
+create dockerfile
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY . /app
+RUN javac Grade.java
+CMD ["java", "Grade"]
+ java file
+import java.util.Scanner;
+
+public class Grade {
+
+    // Returns a letter grade based on the average
+    static char gradeFunction(double avg) {
+        if (avg >= 90) return 'A';
+        else if (avg >= 80) return 'B';
+        else if (avg >= 70) return 'C';
+        else if (avg >= 60) return 'D';
+        else return 'F';
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("How many grades (1 to 5)? ");
+        int count = scanner.nextInt();
+
+        // Validate the input count
+        if (count < 1 || count > 5) {
+            System.out.println("Invalid number. You must enter between 1 and 5 grades.");
+            scanner.close();
+            return; // Exit
+        }
+
+        double sum = 0.0;
+
+        // Read each grade
+        for (int i = 1; i <= count; i++) {
+            System.out.print("Enter grade " + i + ": ");
+            double grade = scanner.nextDouble();
+            sum += grade;
+        }
+
+        double avg = sum / count;
+        System.out.println("Average: " + avg);
+        System.out.println("Letter grade: " + gradeFunction(avg));
+
+        scanner.close();
+    }
+}
+
+docker build -t java-app .
+Step 2. Login to Docker Hub
+docker login
+Enter your Docker Hub username and password
+Step 3: Tag the Docker Image
+Tag the image with your Docker Hub repository:
+docker tag java-app yourusername/java-app:v1
+
+Step 4: Push Image to Docker Hub
+docker push yourusername/java-app:v1
+
+lab 19
+Step 1: Create a Jenkins Pipeline Job
+•	Go to Jenkins Dashboard 
+•	Click New Item → Pipeline → OK
+Step 2: Add Pipeline Script
+pipeline {
+    agent any
+    stages {
+        stage('Clone Code') {
+            steps {
+                git 'https://github.com/your-repo/sample-app.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t my-app .'
+            }
+        }
+        stage('Run Container') {
+            steps {
+                bat 'docker run -d my-app'
+            }
+        }
+    }
+}
+Step 5: Build the Pipeline
+•	Click Build Now 
+•	Monitor in Console Output
+Step 6: Verify Execution
+Check Docker images:
+docker images
+Check running containers:
+docker ps
+
+
+OR
+
+1. Create the job in jenkins by the name Docker Integration with jenkins
+
+2. Configure the settings like the other jenkins programs
+
+3. Create Repository in github and place the Dockerfile and Java File
+
+4. Write the following Commands in Execute Windows batch command Option in jenkins
+
+docker build -t java-app .
+docker run -d -t java-app
+
+5. Save and apply 
+
+6. Once build is success check the image created in docker desktop
+
+
+docker build -t java-app .
+
+
