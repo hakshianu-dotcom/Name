@@ -80,7 +80,7 @@ docker run -p 5000:5000 my-python-app1
 Expected output of app.py:
 Hello from Docker Python Container in web browser
 
- lab 17
+ lab 16
 mkdir docker-app
 cd docker-app
 Create a file named:
@@ -144,6 +144,8 @@ Expected output of app.py:
 Hello from Docker Python Container in web browser
 Open browser:
 http://localhost:8080
+
+17
 docker volume create myvolume
 Verify:
 docker volume ls
@@ -157,11 +159,12 @@ exit
 docker run -it -v myvolume:/data ubuntu bash
 Check file:
 cat /data/test.txt
+docker run -d -p 8081:80 -v myvolume:/usr/share/nginx/html nginx
 Add HTML file:
 docker run -it -v myvolume:/data ubuntu bash
 echo "<h1>Persistent Web Page</h1>" > /data/index.html
 exit
-Open browser:
+Open browser
 http://localhost:8081
 
 lab 18
